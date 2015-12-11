@@ -1,0 +1,37 @@
+[
+{
+  "directory": "/home/robin/programming/c++/renderSound/src",
+  "command": "/usr/bin/c++    -I/home/robin/programming/c++/renderSound/include   -fopenmp -Wall -g -fpermissive -O3 -DNDEBUG   -std=gnu++11 -o CMakeFiles/renderSound.dir/SoundProcessor.cpp.o -c /home/robin/programming/c++/renderSound/src/SoundProcessor.cpp",
+  "file": "/home/robin/programming/c++/renderSound/src/SoundProcessor.cpp"
+},
+{
+  "directory": "/home/robin/programming/c++/renderSound/src",
+  "command": "/usr/bin/c++    -I/home/robin/programming/c++/renderSound/include   -fopenmp -Wall -g -fpermissive -O3 -DNDEBUG   -std=gnu++11 -o CMakeFiles/renderSound.dir/ShaderProgram.cpp.o -c /home/robin/programming/c++/renderSound/src/ShaderProgram.cpp",
+  "file": "/home/robin/programming/c++/renderSound/src/ShaderProgram.cpp"
+},
+{
+  "directory": "/home/robin/programming/c++/renderSound/src",
+  "command": "/usr/bin/c++    -I/home/robin/programming/c++/renderSound/include   -fopenmp -Wall -g -fpermissive -O3 -DNDEBUG   -std=gnu++11 -o CMakeFiles/renderSound.dir/AxisScale.cpp.o -c /home/robin/programming/c++/renderSound/src/AxisScale.cpp",
+  "file": "/home/robin/programming/c++/renderSound/src/AxisScale.cpp"
+},
+{
+  "directory": "/home/robin/programming/c++/renderSound/src",
+  "command": "/usr/bin/c++    -I/home/robin/programming/c++/renderSound/include   -fopenmp -Wall -g -fpermissive -O3 -DNDEBUG   -std=gnu++11 -o CMakeFiles/renderSound.dir/Window.cpp.o -c /home/robin/programming/c++/renderSound/src/Window.cpp",
+  "file": "/home/robin/programming/c++/renderSound/src/Window.cpp"
+},
+{
+  "directory": "/home/robin/programming/c++/renderSound/src",
+  "command": "/usr/bin/c++    -I/home/robin/programming/c++/renderSound/include   -fopenmp -Wall -g -fpermissive -O3 -DNDEBUG   -std=gnu++11 -o CMakeFiles/renderSound.dir/main.cpp.o -c /home/robin/programming/c++/renderSound/src/main.cpp",
+  "file": "/home/robin/programming/c++/renderSound/src/main.cpp"
+},
+{
+  "directory": "/home/robin/programming/c++/renderSound/src",
+  "command": "/usr/bin/c++    -I/home/robin/programming/c++/renderSound/include   -fopenmp -Wall -g -fpermissive -O3 -DNDEBUG   -std=gnu++11 -o CMakeFiles/renderSound.dir/NumberRenderer.cpp.o -c /home/robin/programming/c++/renderSound/src/NumberRenderer.cpp",
+  "file": "/home/robin/programming/c++/renderSound/src/NumberRenderer.cpp"
+},
+{
+  "directory": "/home/robin/programming/c++/renderSound/src",
+  "command": "/usr/bin/c++    -I/home/robin/programming/c++/renderSound/include   -fopenmp -Wall -g -fpermissive -O3 -DNDEBUG   -std=gnu++11 -o CMakeFiles/renderSound.dir/Server.cpp.o -c /home/robin/programming/c++/renderSound/src/Server.cpp",
+  "file": "/home/robin/programming/c++/renderSound/src/Server.cpp"
+}
+]
