@@ -4,12 +4,17 @@
 #include <chrono>
 #include <cstdio>
 #include <cmath>
+
 #include <GL/glew.h>
+
+#include <Stopwatch.h>
+
 #include "Window.h"
 #include "config.h"
 #include "ShaderProgram.h"
 #include "SoundProcessor.h"
 #include "Server.h"
+
 
 typedef struct {
 	unsigned int vbo;
@@ -163,7 +168,12 @@ int main(int argc, char ** argv) {
 	float freq = 200;
 	auto now = std::chrono::high_resolution_clock::now();
 
+	Stopwatch::getInstance().setCustomSignature(32435);
+
 	while (window->open()) {
+		TICK("simulation_total");
+		TICK("simulation_process_events");
+
 		auto events = window->pollEvents();
 
 		for(auto event : events) {
@@ -264,15 +274,19 @@ int main(int argc, char ** argv) {
 			mouseDYScreen = ((((double) mouseDY * 2) / (double) screenSizeY)) * scale[1];
 		}
 
+		TOCK("simulation_process_events");
+
 		double time = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock().now() - now).count()) / 1000000000.0;
 		now = std::chrono::high_resolution_clock().now();
 		unsigned int samples = (float) samplerate * time;
 
 		//std::cout << __PRETTY_FUNCTION__ << ": samples = " << samples;
 
+		TICK("simulation_generate_samples");
+
 		double * current_samples = soundProcessor.sample(samples);
 
-
+		TOCK("simulation_generate_samples");
 /*
 		for(int i = 0; i < samples * listener.size(); i++) {
 			std::cout << current_samples[i] << std::endl;
@@ -281,6 +295,9 @@ int main(int argc, char ** argv) {
 		server.send(current_samples, samples * listener.size());
 
 		free(current_samples);
+
+
+		TICK("simulation_draw");
 
 		glBindBuffer(GL_ARRAY_BUFFER,  points.vbo);
 		shaderProgram->useProgram();
@@ -291,8 +308,12 @@ int main(int argc, char ** argv) {
 
 		glDrawArrays(GL_POINTS, 0, count);
 
-
 		window->display();
+		TOCK("simulation_draw");
+
+		TOCK("simulation_total");
+
+        Stopwatch::getInstance().sendAll();
     }
 
 	return 0;
