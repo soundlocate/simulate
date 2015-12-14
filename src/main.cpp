@@ -9,6 +9,7 @@
 #include "config.h"
 #include "ShaderProgram.h"
 #include "SoundProcessor.h"
+#include "Server.h"
 
 typedef struct {
 	unsigned int vbo;
@@ -108,6 +109,11 @@ int main(int argc, char ** argv) {
 	glew_init();
 
 	int listener_count = init_listeners(points_buffer, soundProcessor, radius);
+
+	Server server(atoi(argv[1]), [listener_count](sf::TcpSocket * socket) {
+			socket->send(&listener_count, sizeof(int));
+			std::cout << "client connected: " << socket->getRemoteAddress() << ":" << socket->getRemotePort() << std::endl;
+		});
 
 	count = listener_count;
 
@@ -262,22 +268,29 @@ int main(int argc, char ** argv) {
 		now = std::chrono::high_resolution_clock().now();
 		unsigned int samples = (float) samplerate * time;
 
+		//std::cout << __PRETTY_FUNCTION__ << ": samples = " << samples;
+
 		double * current_samples = soundProcessor.sample(samples);
 
-		for(int i = 0; i < samples; i++) {
+
+/*
+		for(int i = 0; i < samples * listener.size(); i++) {
 			std::cout << current_samples[i] << std::endl;
 		}
+*/
+		server.send(current_samples, samples * listener.size());
 
 		free(current_samples);
 
 		glBindBuffer(GL_ARRAY_BUFFER,  points.vbo);
 		shaderProgram->useProgram();
-		glBindVertexArray(points.vao);
+	    glBindVertexArray(points.vao);
 
 		shaderProgram->uniform2f("center", centerX - mouseDXScreen, centerY - mouseDYScreen);
 		shaderProgram->uniform2f("scale", scale[0], scale[1]);
 
 		glDrawArrays(GL_POINTS, 0, count);
+
 
 		window->display();
     }

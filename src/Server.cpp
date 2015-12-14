@@ -1,10 +1,17 @@
 #include "Server.h"
 
 
-Server::Server(unsigned short port, unsigned int listenerCount) {
+Server::Server(unsigned short port, std::function<void (sf::TcpSocket *)> onAcceptFunction) {
+	listener.listen(port);
 
-}
+	std::thread([this, onAcceptFunction](){
+			while(true) {
+				sf::TcpSocket * socket = new sf::TcpSocket;
+				listener.accept(*socket);
 
-int Server::send(double [][8], unsigned int count) {
-	return 0;
+				onAcceptFunction(socket);
+
+			    clients.push_back(socket);
+			}
+		}).detach();
 }

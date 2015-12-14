@@ -1,9 +1,9 @@
 #include "SoundProcessor.h"
 
 SoundProcessor::SoundProcessor(int samplerate, std::vector<v3> dists) {
-  m_samplerate = samplerate;
-  m_dists = dists;
-  m_speed /= (m_samplerate);
+	m_samplerate = samplerate;
+	m_dists = dists;
+	m_speed /= (m_samplerate);
 }
 
 //ToDo(robin): add veclocity and pitch support
@@ -25,16 +25,19 @@ int SoundProcessor::remove(float x, float y) {
 }
 
 double * SoundProcessor::sample(int count) {
-	double * ret = (double *) malloc(sizeof(double) * (m_dists.size() / 3) * count);
+	double * ret = (double *) malloc(sizeof(double) * m_dists.size() * count);
 	double value = 0;
 
-	std::cout << __PRETTY_FUNCTION__ << "ret = " << ret << count << std::endl;
+//	std::cout << __PRETTY_FUNCTION__ << "ret = " << ret << std::endl;
+//	std::cout << __PRETTY_FUNCTION__ << "count = " << count << std::endl;
+
+	int k = 0;
 
 	for(int i = 0; i < count; i++) {
 		m_samples++;
-		int k = 0;
 
-		for(auto mic : m_dists) {
+		for(int j = 0; j < m_dists.size(); j++) {
+		    v3 mic = m_dists[j];
 			value = 0;
 
 			for(auto source : m_objs) {
@@ -44,11 +47,9 @@ double * SoundProcessor::sample(int count) {
 				}
 			}
 
-			ret[i * 8 + k++] = value;
+			ret[k++] = value / ((m_objs.size() != 0) ? m_objs.size() : 1);
 		}
 	}
-
-	std::cout << __PRETTY_FUNCTION__ << "ret = " << ret << count << std::endl;
 
 	return ret;
 }
