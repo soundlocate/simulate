@@ -17,9 +17,9 @@ int ShaderProgram::vertexAttribPointer(const char * name, int count, int type, b
 	glUseProgram(m_id);
 
 	int attrib = glGetAttribLocation(m_id, name); 
-
-	glEnableVertexAttribArray(attrib);
+	
 	glVertexAttribPointer(attrib, count, type, normalized, stride, offset);
+	glEnableVertexAttribArray(attrib);
 
 	return 0;
 }
@@ -44,12 +44,6 @@ int ShaderProgram::uniform1i(const char * name, int x) {
 	glUseProgram(m_id);
 
 	glUniform1i(glGetUniformLocation(m_id, name), x);
-
-	return 0;
-}
-
-int ShaderProgram::bindFragDataLocation(int target, const char *name) {
-	glBindFragDataLocation(m_id, target, name);
 
 	return 0;
 }
