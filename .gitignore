@@ -207,3 +207,4 @@ tramp
 !/src/glyphs.o
 cmake_install.cmake
 compile_commands.json
+todo.org
