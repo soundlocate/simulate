@@ -108,7 +108,6 @@ int main(int argc, char ** argv) {
 	listener.push_back(SoundProcessor::v3(0, -1, 1 / sqrt(2)));
 	listener.push_back(SoundProcessor::v3(0, 1, 1 / sqrt(2)));
 
-
 	SoundProcessor soundProcessor(samplerate, listener);
 
 	glew_init();
@@ -123,32 +122,40 @@ int main(int argc, char ** argv) {
 	count = listener_count;
 
 	glGenBuffers(1, &points.vbo);
-	glGenVertexArrays(1, &points.vao);
+
+//  intel why??????? :(
+//	glGenVertexArrays(1, &points.vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, points.vbo);
-	glBufferData(GL_ARRAY_BUFFER, 6 * count * sizeof(float), points_buffer.data(), GL_STREAM_DRAW);
-	glBindVertexArray(points.vao);
 
-	ShaderProgram * shaderProgram = new ShaderProgram("#version 150\n"
-													  "uniform vec2 center;\n"
-													  "uniform vec2 scale;\n"
-													  "in vec3 vp;\n"
-													  "in vec3 color;\n"
-													  "out vec3 Color;\n"
+    GLfloat vertices[] = {
+        0.0f, 0.5f,
+        0.5f, -0.5f,
+        -0.5f, -0.5f
+    };
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+//	glBufferData(GL_ARRAY_BUFFER, 6 * count * sizeof(float), points_buffer.data(), GL_STREAM_DRAW);
+//	glBindVertexArray(points.vao);
+
+	ShaderProgram * shaderProgram = new ShaderProgram("#version 150 core\n"
+													  "in vec2 vp;\n"
 													  "void main() {\n"
-													  "   gl_Position = vec4((vp.x + center.x) / scale.x, (vp.y - center.y) / scale.y, 0.0, 1.0);\n"
-													  "   gl_PointSize = vp.z / scale.x;\n"
-													  "   Color = color;\n"
+													  "   gl_Position = vec4(vp.x, vp.y, 0.0, 1.0);\n"
 													  "}\n"
-													  , "#version 150\n"
-													  "in vec3 Color;\n"
+													  , "#version 150 core\n"
 													  "out vec4 frag_colour;\n"
 													  "void main () {\n"
-													  "    frag_colour = vec4(Color, 1.0);\n"
+													  "    frag_colour = vec4(1.0, 0.0, 0.0, 1.0);\n"
  													  "}");
 
-	shaderProgram->vertexAttribPointer("color", 3, GL_FLOAT, false, 24, (void *) 12);
-	shaderProgram->vertexAttribPointer("vp", 3, GL_FLOAT, false, 24, 0);
+
+	shaderProgram->bindFragDataLocation(0, "frag_colour");
+	shaderProgram->vertexAttribPointer("vp", 2, GL_FLOAT, false, 0, 0);
+
+//shaderProgram->vertexAttribPointer("color", 3, GL_FLOAT, false, 24, (void *) 12);
+//shaderProgram->vertexAttribPointer("vp", 3, GL_FLOAT, false, 24, 0);
 
     glEnable(GL_POINT_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
@@ -157,8 +164,8 @@ int main(int argc, char ** argv) {
     glPointSize(20.0);
 	glLineWidth(3.0);
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	glEnable(GL_BLEND);
 
 	glClearColor(1, 1, 1, 1);
 
@@ -170,12 +177,14 @@ int main(int argc, char ** argv) {
 
 	Stopwatch::getInstance().setCustomSignature(32435);
 
+	glViewport(0, 0, 1920, 1080);
+
 	while (window->open()) {
 		TICK("simulation_total");
 		TICK("simulation_process_events");
 
 		auto events = window->pollEvents();
-
+/*
 		for(auto event : events) {
 			switch (event.type) {
 			case sf::Event::Closed: {
@@ -263,7 +272,7 @@ int main(int argc, char ** argv) {
 				break;
 			}
 		}
-
+*/
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		if (mouseDown) {
@@ -301,12 +310,15 @@ int main(int argc, char ** argv) {
 
 		glBindBuffer(GL_ARRAY_BUFFER,  points.vbo);
 		shaderProgram->useProgram();
-	    glBindVertexArray(points.vao);
+//	    glBindVertexArray(points.vao);
 
-		shaderProgram->uniform2f("center", centerX - mouseDXScreen, centerY - mouseDYScreen);
-		shaderProgram->uniform2f("scale", scale[0], scale[1]);
+//		shaderProgram->uniform2f("center", centerX - mouseDXScreen, centerY - mouseDYScreen);
+//		shaderProgram->uniform2f("scale", scale[0], scale[1]);
+//		shaderProgram->vertexAttribPointer("color", 3, GL_FLOAT, false, 24, (void *) 12);
+//		shaderProgram->vertexAttribPointer("vp", 3, GL_FLOAT, false, 24, 0);
 
-		glDrawArrays(GL_POINTS, 0, count);
+		shaderProgram->vertexAttribPointer("vp", 2, GL_FLOAT, false, 0, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		window->display();
 		TOCK("simulation_draw");

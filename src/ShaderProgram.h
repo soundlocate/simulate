@@ -16,6 +16,7 @@ public:
 	int useProgram();
 	int uniform2f(const char * name, float x, float y);
 	int uniform1i(const char * name, int x);
+	int bindFragDataLocation(int target, const char * name);
 private:
 	int m_newShader(int type, const char * source);
 	
