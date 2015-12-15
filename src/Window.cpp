@@ -6,7 +6,7 @@ Window::Window(int x, int y, const char * name) {
     settings.stencilBits = 8;
     settings.antialiasingLevel = 4;
     settings.majorVersion = 3;
-    settings.minorVersion = 3;
+    settings.minorVersion = 0;
 
 	m_window = new sf::RenderWindow(sf::VideoMode(x, y), name, sf::Style::Default, settings);
 

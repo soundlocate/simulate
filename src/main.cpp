@@ -33,6 +33,8 @@ double listenerPos[3 * 4] = {
 };
 
 int glew_init() {
+	glewExperimental = true;
+
 	int status = glewInit();
 
     if (status != GLEW_OK) {
@@ -129,7 +131,7 @@ int main(int argc, char ** argv) {
 	glBufferData(GL_ARRAY_BUFFER, 6 * count * sizeof(float), points_buffer.data(), GL_STREAM_DRAW);
 	glBindVertexArray(points.vao);
 
-	ShaderProgram * shaderProgram = new ShaderProgram("#version 150\n"
+	ShaderProgram * shaderProgram = new ShaderProgram("#version 130\n"
 													  "uniform vec2 center;\n"
 													  "uniform vec2 scale;\n"
 													  "in vec3 vp;\n"
@@ -140,11 +142,11 @@ int main(int argc, char ** argv) {
 													  "   gl_PointSize = vp.z / scale.x;\n"
 													  "   Color = color;\n"
 													  "}\n"
-													  , "#version 150\n"
+													  , "#version 130\n"
 													  "in vec3 Color;\n"
 													  "out vec4 frag_colour;\n"
 													  "void main () {\n"
-													  "    frag_colour = vec4(Color, 1.0);\n"
+													  "    gl_FragColor = vec4(Color, 1.0);\n"
  													  "}");
 
 	shaderProgram->vertexAttribPointer("color", 3, GL_FLOAT, false, 24, (void *) 12);
