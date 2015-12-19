@@ -20,7 +20,7 @@ int Server::send(T * data, unsigned int count) {
 	int i = 0;
 
 	for(auto client : clients) {
-		if(client->send(data, sizeof(T) * count) != sf::Socket::Done) {
+		if(client->send(data, sizeof(T) * count) == sf::Socket::Disconnected) {
 			clients.erase(clients.begin() + i);
 		}
 

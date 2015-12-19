@@ -101,7 +101,7 @@ int main(int argc, char ** argv) {
 
 	float scale[2] = {1.0, 1.0}, centerX = 0.0, centerY = 0.0, mouseDXScreen = 0.0, mouseDYScreen = 0.0;
 	float radius = 50;
-	unsigned int samplerate = 44100;
+	unsigned int samplerate = 192000;
 
 	std::vector<SoundProcessor::v3> listener;
 
@@ -167,7 +167,7 @@ int main(int argc, char ** argv) {
 	screenSizeX = window->getSize().x;
 	screenSizeY = window->getSize().y;
 
-	float freq = 200;
+	float freq = 100;
 	auto now = std::chrono::high_resolution_clock::now();
 
 	Stopwatch::getInstance().setCustomSignature(32435);
@@ -215,7 +215,7 @@ int main(int argc, char ** argv) {
 
 							soundProcessor.remove(points_buffer[6 * i], points_buffer[6 * i + 1]);
 
-							obj_buffer.erase(obj_buffer.begin() + i - 1);
+							obj_buffer.erase(obj_buffer.begin() + i - listener.size());
 
 							break;
 						}
