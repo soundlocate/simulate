@@ -15,8 +15,10 @@ int SoundProcessor::add(SoundProcessor::SoundObject * o) {
 }
 
 int SoundProcessor::remove(float x, float y) {
+	std::cout << "to remove" <<": " << x << " | " << y;
 	for(int i = 0; i < m_objs.size(); i++) {
-		if((abs(m_objs[i]->x - x) <= 0.0001) && abs(m_objs[i]->y - y) <= 0.0001) {
+		std::cout << i <<": " << m_objs[i]->x << " | " << m_objs[i]->y;
+		if((fabs(m_objs[i]->x - x) <= 0.0001) && fabs(m_objs[i]->y - y) <= 0.0001) {
 			std::cout << "removed: " << m_objs[i]->freq << std::endl;
 			m_objs.erase(m_objs.begin() + i);
 			return 0;

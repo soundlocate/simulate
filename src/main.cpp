@@ -65,7 +65,7 @@ int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_proc
 	points_buffer.push_back(1);
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
-#if 0
+
 	points_buffer.push_back(0);
 	points_buffer.push_back(1);
 	points_buffer.push_back(radius);
@@ -86,7 +86,6 @@ int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_proc
 	points_buffer.push_back(1);
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
-#endif
 
 	return count;
 }
@@ -107,9 +106,9 @@ int main(int argc, char ** argv) {
 	std::vector<SoundProcessor::v3> listener;
 
 	listener.push_back(SoundProcessor::v3(0, 0, 0));
-//	listener.push_back(SoundProcessor::v3(0, 1, 0));
-//	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)), 0.5, 0));
-//	listener.push_back(SoundProcessor::v3(0, 1, 1));
+	listener.push_back(SoundProcessor::v3(0, 1, 0));
+	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)), 0.5, 0));
+	listener.push_back(SoundProcessor::v3(0, 1, 1));
 
 	SoundProcessor soundProcessor(samplerate, listener);
 
@@ -117,12 +116,14 @@ int main(int argc, char ** argv) {
 
 	int listener_count = init_listeners(points_buffer, soundProcessor, radius);
 
-	Server server(atoi(argv[1]), [listener_count](sf::TcpSocket * socket) {
-			socket->send(&listener_count, sizeof(int));
+	Server server(atoi(argv[1]), [listener](sf::TcpSocket * socket) {
+			unsigned int size = listener.size();
+
+			socket->send(&size, sizeof(int));
 			std::cout << "client connected: " << socket->getRemoteAddress() << ":" << socket->getRemotePort() << std::endl;
 		});
 
-	count = listener_count;
+	count = listener.size();
 
 	glGenBuffers(1, &points.vbo);
 	glGenVertexArrays(1, &points.vao);
@@ -209,25 +210,12 @@ int main(int argc, char ** argv) {
 						dy = (points_buffer[6 * i + 1] - y) * screenSizeY * scale[1];
 
 						if(sqrt(dx * dx + dy * dy) < radius * scale[0]) {
-							for(auto value : points_buffer) {
-								std::cout << value << std::endl;
-							}
-
 							soundProcessor.remove(points_buffer[6 * i], points_buffer[6 * i + 1]);
-							points_buffer.erase(points_buffer.begin() + 6 * i, points_buffer.begin() + 6 * i + 6);
+							points_buffer.erase(points_buffer.begin() + 6 * i - 1, points_buffer.begin() + 6 * i + 5);
+							obj_buffer.erase(obj_buffer.begin() + i - listener.size());
+
 							count--;
 							add = false;
-
-							std::cout << "removed id: " << i - listener.size() << std::endl;
-
-							obj_buffer.erase(obj_buffer.begin() + (i - listener.size()));
-
-							for(auto value : points_buffer) {
-								std::cout << value << std::endl;
-							}
-
-							glBindBuffer(GL_ARRAY_BUFFER, points.vbo);
-							glBufferData(GL_ARRAY_BUFFER, 6 * count * sizeof(float),  points_buffer.data(), GL_STREAM_DRAW);
 
 							break;
 						}
@@ -250,7 +238,8 @@ int main(int argc, char ** argv) {
 
 						std::cout << "adding with freq: " << freq << std::endl;
 
-						freq += 50;
+						freq += 0;
+						//freq += 5;
 
 						count++;
 					}
