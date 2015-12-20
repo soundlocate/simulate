@@ -9,7 +9,7 @@ SET_TARGET_PROPERTIES(${project_BIN} PROPERTIES VERSION "${APPLICATION_VERSION_M
 
 #TARGET_COMPILE_FEATURES(${PROJECT_NAME} PRIVATE cxx_constexpr)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -std=c++14 -xHOST -O3 -ipo -no-prec-div -fp-model fast=2 -fPIE -static-intel")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -std=c++14 -xHOST -ipo -no-prec-div -fp-model fast=2 -static-intel -parallel")
 
 # -fopt-info-vec-missed
 

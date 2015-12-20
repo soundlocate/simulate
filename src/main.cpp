@@ -59,20 +59,13 @@ int glew_init() {
 int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_processor, float radius) {
 	int count = 4;
 
-	points_buffer.push_back(1);
+	points_buffer.push_back(0);
 	points_buffer.push_back(0);
 	points_buffer.push_back(radius);
 	points_buffer.push_back(1);
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
-
-	points_buffer.push_back(-1);
-	points_buffer.push_back(0);
-	points_buffer.push_back(radius);
-	points_buffer.push_back(1);
-	points_buffer.push_back(0);
-	points_buffer.push_back(0);
-
+#if 0
 	points_buffer.push_back(0);
 	points_buffer.push_back(1);
 	points_buffer.push_back(radius);
@@ -80,12 +73,20 @@ int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_proc
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
 
-	points_buffer.push_back(0);
-	points_buffer.push_back(-1);
+	points_buffer.push_back(sin(M_PI * (60.0 / 180.0)));
+	points_buffer.push_back(0.5);
 	points_buffer.push_back(radius);
 	points_buffer.push_back(1);
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
+
+	points_buffer.push_back(0.5 * sin(M_PI * (60.0 / 180.0)));
+	points_buffer.push_back(0.5);
+	points_buffer.push_back(radius);
+	points_buffer.push_back(1);
+	points_buffer.push_back(0);
+	points_buffer.push_back(0);
+#endif
 
 	return count;
 }
@@ -105,11 +106,10 @@ int main(int argc, char ** argv) {
 
 	std::vector<SoundProcessor::v3> listener;
 
-	listener.push_back(SoundProcessor::v3(-1, 0, -1 / sqrt(2)));
-	listener.push_back(SoundProcessor::v3(1, 0, -1 / sqrt(2)));
-	listener.push_back(SoundProcessor::v3(0, -1, 1 / sqrt(2)));
-	listener.push_back(SoundProcessor::v3(0, 1, 1 / sqrt(2)));
-
+	listener.push_back(SoundProcessor::v3(0, 0, 0));
+//	listener.push_back(SoundProcessor::v3(0, 1, 0));
+//	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)), 0.5, 0));
+//	listener.push_back(SoundProcessor::v3(0, 1, 1));
 
 	SoundProcessor soundProcessor(samplerate, listener);
 
@@ -204,18 +204,30 @@ int main(int argc, char ** argv) {
 					x = (2.0 * (x / screenSizeX) - 1.0) * scale[0] - centerX;
 					y = -(2.0 * (y / screenSizeY) - 1.0) * scale[1] + centerY;
 
-					for(int i = (points_buffer.size() / 6) - 1; i > listener_count - 1; i--) {
+					for(int i = (points_buffer.size() / 6) - 1; i > listener.size() - 1; i--) {
 						dx = (points_buffer[6 * i] - x) * screenSizeX * scale[0];
 						dy = (points_buffer[6 * i + 1] - y) * screenSizeY * scale[1];
 
 						if(sqrt(dx * dx + dy * dy) < radius * scale[0]) {
-							points_buffer.erase(points_buffer.begin() + 6 * i - 1, points_buffer.begin() + 6 * i + 5);
+							for(auto value : points_buffer) {
+								std::cout << value << std::endl;
+							}
+
+							soundProcessor.remove(points_buffer[6 * i], points_buffer[6 * i + 1]);
+							points_buffer.erase(points_buffer.begin() + 6 * i, points_buffer.begin() + 6 * i + 6);
 							count--;
 							add = false;
 
-							soundProcessor.remove(points_buffer[6 * i], points_buffer[6 * i + 1]);
+							std::cout << "removed id: " << i - listener.size() << std::endl;
 
-							obj_buffer.erase(obj_buffer.begin() + i - listener.size());
+							obj_buffer.erase(obj_buffer.begin() + (i - listener.size()));
+
+							for(auto value : points_buffer) {
+								std::cout << value << std::endl;
+							}
+
+							glBindBuffer(GL_ARRAY_BUFFER, points.vbo);
+							glBufferData(GL_ARRAY_BUFFER, 6 * count * sizeof(float),  points_buffer.data(), GL_STREAM_DRAW);
 
 							break;
 						}
@@ -230,10 +242,13 @@ int main(int argc, char ** argv) {
 						points_buffer.push_back(0);
 
 						ObjectInfo oinfo;
+						SoundProcessor::SoundObject * obj = new SoundProcessor::SoundObject(x, y, freq);
 
-						oinfo.id = soundProcessor.add(SoundProcessor::SoundObject(x, y, freq));
+						oinfo.id = soundProcessor.add(obj);
 
 						obj_buffer.push_back(oinfo);
+
+						std::cout << "adding with freq: " << freq << std::endl;
 
 						freq += 50;
 

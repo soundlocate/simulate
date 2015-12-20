@@ -21,7 +21,8 @@ public:
 		};
 	};
 
-	struct SoundObject{
+	class SoundObject{
+	public:
 		float x;
 		float y;
 		float z;
@@ -41,21 +42,21 @@ public:
 
 	SoundProcessor(int samplerate, std::vector<v3> mics);
 
-	int add(SoundObject o);
+	int add(SoundObject * o);
 	int remove(float x, float y);
 
 	double * sample(int count);
 private:
 	double * m_createSineWave(float freq);
-	inline double m_sin(float freq, unsigned int sample);
-	inline double m_dist(float x1, float y1, float z1, float x2, float y2, float z2);
+	inline double m_sin(double freq, unsigned int sample);
+	inline double m_dist(double x1, double y1, double z1, double x2, double y2, double z2);
 
 	int m_samplerate = 0;
-	int m_samples = 0;
+	unsigned int m_samples = 0;
 
 	double m_speed = 340;
 
-	std::vector<SoundObject> m_objs;
+	std::vector<SoundObject *> m_objs;
     std::vector<v3> m_dists;
 	std::vector<double *> m_buffer;
 };
