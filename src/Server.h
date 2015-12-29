@@ -10,6 +10,7 @@ public:
 
 	template <typename T>
 	int send(T * data, unsigned int count);
+	void close();
 private:
 	sf::TcpListener listener;
 	std::vector<sf::TcpSocket *> clients;

@@ -23,14 +23,14 @@ public:
 
 	class SoundObject{
 	public:
-		float x;
-		float y;
-		float z;
-		float vx;
-		float vy;
-		float pitch;
-		float freq;
-		unsigned int sample;
+		float x = 0;
+		float y = 0;
+		float z = 0;
+		float vx = 0;
+		float vy = 0;
+		float pitch = 0;
+		float freq = 0;
+		unsigned int sample = 0;
 
 	    SoundObject(float x, float y, float freq) {
 			this->x = x;

@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstdio>
 #include <cmath>
+#include <csignal>
 
 #include <GL/glew.h>
 
@@ -14,7 +15,11 @@
 #include "ShaderProgram.h"
 #include "SoundProcessor.h"
 #include "Server.h"
+#include "Client.h"
 
+Server * server;
+
+constexpr int FREQUENCY_INCREMENT = 5;
 
 typedef struct {
 	unsigned int vbo;
@@ -24,6 +29,16 @@ typedef struct {
 typedef struct {
 	unsigned int id;
 } ObjectInfo;
+
+typedef union {
+    struct {
+	    double x;
+	    double y;
+	    double z;
+	};
+
+	double pos[3];
+} v3;
 
 double listenerPos[3 * 4] = {
 	1, 0, -0.707,
@@ -90,12 +105,23 @@ int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_proc
 	return count;
 }
 
+void terminate(int signal) {
+	server->close();
+
+	exit(EXIT_SUCCESS);
+}
+
+
 int main(int argc, char ** argv) {
 	Window * window = new Window(800, 600, APPLICATION_NAME);
 	buffer points;
+	buffer lines;
 	int count = 1;
+
+	std::vector<float> lines_buffer;
 	std::vector<float> points_buffer;
 	std::vector<ObjectInfo> obj_buffer;
+
 	bool mouseDown = false;
 	int mouseX = 0, mouseY = 0, mouseDX = 0, mouseDY = 0, screenSizeX = window->getSize().x, screenSizeY =  window->getSize().y;
 
@@ -104,6 +130,10 @@ int main(int argc, char ** argv) {
 	unsigned int samplerate = 192000;
 
 	std::vector<SoundProcessor::v3> listener;
+
+	std::signal(SIGTERM, terminate);
+	std::signal(SIGINT, terminate);
+	std::signal(SIGABRT, terminate);
 
 	listener.push_back(SoundProcessor::v3(0, 0, 0));
 	listener.push_back(SoundProcessor::v3(0, 1, 0));
@@ -116,12 +146,14 @@ int main(int argc, char ** argv) {
 
 	int listener_count = init_listeners(points_buffer, soundProcessor, radius);
 
-	Server server(atoi(argv[1]), [listener](sf::TcpSocket * socket) {
+	server = new Server(atoi(argv[1]), [listener](sf::TcpSocket * socket) {
 			unsigned int size = listener.size();
 
 			socket->send(&size, sizeof(int));
 			std::cout << "client connected: " << socket->getRemoteAddress() << ":" << socket->getRemotePort() << std::endl;
 		});
+
+	Client client(argv[2], atoi(argv[3]));
 
 	count = listener.size();
 
@@ -149,6 +181,44 @@ int main(int argc, char ** argv) {
 													  "void main () {\n"
 													  "    gl_FragColor = vec4(Color, 1.0);\n"
  													  "}");
+
+	shaderProgram->vertexAttribPointer("color", 3, GL_FLOAT, false, 24, (void *) 12);
+	shaderProgram->vertexAttribPointer("vp", 3, GL_FLOAT, false, 24, 0);
+
+	lines_buffer.push_back(-1);
+	lines_buffer.push_back(0);
+	lines_buffer.push_back(1);
+	lines_buffer.push_back(0);
+	lines_buffer.push_back(1);
+	lines_buffer.push_back(0);
+
+	lines_buffer.push_back(1);
+	lines_buffer.push_back(0);
+	lines_buffer.push_back(1);
+	lines_buffer.push_back(0);
+	lines_buffer.push_back(1);
+	lines_buffer.push_back(0);
+
+	lines_buffer.push_back(0);
+	lines_buffer.push_back(-1);
+	lines_buffer.push_back(1);
+	lines_buffer.push_back(0);
+	lines_buffer.push_back(1);
+	lines_buffer.push_back(0);
+
+	lines_buffer.push_back(0);
+	lines_buffer.push_back(1);
+	lines_buffer.push_back(1);
+	lines_buffer.push_back(0);
+	lines_buffer.push_back(1);
+	lines_buffer.push_back(0);
+
+	glGenBuffers(1, &lines.vbo);
+	glGenVertexArrays(1, &lines.vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, lines.vbo);
+	glBufferData(GL_ARRAY_BUFFER, lines_buffer.size() * sizeof(float), lines_buffer.data(), GL_STREAM_DRAW);
+	glBindVertexArray(lines.vao);
 
 	shaderProgram->vertexAttribPointer("color", 3, GL_FLOAT, false, 24, (void *) 12);
 	shaderProgram->vertexAttribPointer("vp", 3, GL_FLOAT, false, 24, 0);
@@ -238,8 +308,8 @@ int main(int argc, char ** argv) {
 
 						std::cout << "adding with freq: " << freq << std::endl;
 
-						freq += 0;
-						//freq += 5;
+						//freq += 0;
+						freq += FREQUENCY_INCREMENT;
 
 						count++;
 					}
@@ -298,21 +368,40 @@ int main(int argc, char ** argv) {
 			std::cout << current_samples[i] << std::endl;
 		}
 */
-		server.send(current_samples, samples * listener.size());
+		server->send(current_samples, samples * listener.size());
 
 		free(current_samples);
 
 
 		TICK("simulation_draw");
 
-		glBindBuffer(GL_ARRAY_BUFFER,  points.vbo);
-		shaderProgram->useProgram();
+//		glBindBuffer(GL_ARRAY_BUFFER,  points.vbo);
+//		shaderProgram->useProgram();
 	    glBindVertexArray(points.vao);
 
 		shaderProgram->uniform2f("center", centerX - mouseDXScreen, centerY - mouseDYScreen);
 		shaderProgram->uniform2f("scale", scale[0], scale[1]);
 
+		glBufferData(GL_ARRAY_BUFFER, 6 * count * sizeof(float), points_buffer.data(), GL_STREAM_DRAW);
+
 		glDrawArrays(GL_POINTS, 0, count);
+
+		glBindVertexArray(lines.vao);
+
+		std::vector<float> data = client.getPoints();
+
+		lines_buffer.clear();
+		lines_buffer.insert(lines_buffer.begin(), data.begin(), data.end());
+
+		glBindBuffer(GL_ARRAY_BUFFER, lines.vbo);
+//		glBufferData(GL_ARRAY_BUFFER, lines_buffer.size() * sizeof(float), lines_buffer.data(), GL_STREAM_DRAW);
+
+//		glDrawArrays(GL_LINES, 0, lines_buffer.size() / 6);
+
+		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STREAM_DRAW);
+
+		if(count > listener.size())
+			glDrawArrays(GL_LINES, 0, data.size() / 6);
 
 		window->display();
 		TOCK("simulation_draw");
@@ -321,6 +410,8 @@ int main(int argc, char ** argv) {
 
         Stopwatch::getInstance().sendAll();
     }
+
+	terminate(0);
 
 	return 0;
 }

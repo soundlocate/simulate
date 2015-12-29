@@ -15,3 +15,11 @@ Server::Server(unsigned short port, std::function<void (sf::TcpSocket *)> onAcce
 			}
 		}).detach();
 }
+
+void Server::close() {
+	for(auto socket : clients) {
+		socket->disconnect();
+	}
+
+	listener.close();
+}
