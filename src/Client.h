@@ -12,7 +12,20 @@ public:
 	std::vector<float> getPoints();
 
 private:
-	int m_new_point(float x, float y);
+	union v3 {
+		struct {
+			float x;
+			float y;
+			float z;
+		};
+
+		float pos[3];
+
+		v3(float x, float y, float z) : x(x), y(y), z(z) {
+		}
+	};
+
+	int m_new_point(float x, float y, v3 color);
 
 	sf::TcpListener * m_socket;
 	std::vector<sf::TcpSocket *> m_connections;

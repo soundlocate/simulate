@@ -54,7 +54,7 @@ private:
 	int m_samplerate = 0;
 	unsigned int m_samples = 0;
 
-	double m_speed = 340;
+	double m_speed = 343.2;
 
 	std::vector<SoundObject *> m_objs;
     std::vector<v3> m_dists;

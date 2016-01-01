@@ -45,7 +45,7 @@ std::vector<float> Client::getPoints() {
 		to_receive = sizeof(double) * 3 * point_count;
 		receive_buffer = (double *) malloc(to_receive);
 
-//		std::cout << "going to receive " << point_count << " points" << std::endl;
+  		std::cout << "going to receive " << point_count << " points" << std::endl;
 
 	    client->receive(receive_buffer, to_receive, received);
 
@@ -58,42 +58,57 @@ std::vector<float> Client::getPoints() {
 		m_points.erase(m_points.begin(), m_points.end());
 
 		for (int i = 0; i < point_count; i++) {
-			m_new_point(receive_buffer[3 * i], receive_buffer[3 * i + 1]);
-		}
+			v3 low = {0, 0, 1};
+			v3 high = {1, 0, 0};
+			v3 color = {0, 0, 0};
 
+			for(int j = 0; j < 3; j++) {
+				color.pos[j] = low.pos[j] + ((double) i / (double) (point_count - 1)) * (high.pos[j] - low.pos[j]);
+			}
+
+			m_new_point(receive_buffer[3 * i], receive_buffer[3 * i + 1], color);
+		}
 	}
 
 	return std::vector<float>(m_points);
 }
 
-int Client::m_new_point(float x, float y) {
-	m_points.push_back(x);
+int Client::m_new_point(float x, float y, v3 color) {
+/*  m_points.push_back(x);
 	m_points.push_back(-1000);
 	m_points.push_back(1);
-	m_points.push_back(0);
-	m_points.push_back(1);
-	m_points.push_back(0);
+	m_points.push_back(color.x);
+	m_points.push_back(color.y);
+	m_points.push_back(color.z);
 
 	m_points.push_back(x);
 	m_points.push_back(1000);
 	m_points.push_back(1);
-	m_points.push_back(0);
-	m_points.push_back(1);
-	m_points.push_back(0);
+	m_points.push_back(color.x);
+	m_points.push_back(color.y);
+	m_points.push_back(color.z);
 
 	m_points.push_back(-1000);
 	m_points.push_back(y);
 	m_points.push_back(1);
-	m_points.push_back(0);
-	m_points.push_back(1);
-	m_points.push_back(0);
+	m_points.push_back(color.x);
+	m_points.push_back(color.y);
+	m_points.push_back(color.z);
 
 	m_points.push_back(1000);
 	m_points.push_back(y);
 	m_points.push_back(1);
-	m_points.push_back(0);
-	m_points.push_back(1);
-	m_points.push_back(0);
+	m_points.push_back(color.x);
+	m_points.push_back(color.y);
+	m_points.push_back(color.z);
+*/
+
+	m_points.push_back(x);
+	m_points.push_back(y);
+	m_points.push_back(20);
+	m_points.push_back(color.x);
+	m_points.push_back(color.y);
+	m_points.push_back(color.z);
 
 	return 0;
 }

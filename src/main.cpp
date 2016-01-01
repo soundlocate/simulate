@@ -19,7 +19,7 @@
 
 Server * server;
 
-constexpr int FREQUENCY_INCREMENT = 5;
+constexpr int FREQUENCY_INCREMENT = 1;
 
 typedef struct {
 	unsigned int vbo;
@@ -73,6 +73,7 @@ int glew_init() {
 
 int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_processor, float radius) {
 	int count = 4;
+	double line_length = 1;
 
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
@@ -82,21 +83,21 @@ int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_proc
 	points_buffer.push_back(0);
 
 	points_buffer.push_back(0);
-	points_buffer.push_back(1);
+	points_buffer.push_back(1 * line_length);
 	points_buffer.push_back(radius);
 	points_buffer.push_back(1);
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
 
-	points_buffer.push_back(sin(M_PI * (60.0 / 180.0)));
-	points_buffer.push_back(0.5);
+	points_buffer.push_back(sin(M_PI * (60.0 / 180.0)) * line_length);
+	points_buffer.push_back(0.5 * line_length);
 	points_buffer.push_back(radius);
 	points_buffer.push_back(1);
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
 
-	points_buffer.push_back(0.5 * sin(M_PI * (60.0 / 180.0)));
-	points_buffer.push_back(0.5);
+	points_buffer.push_back(0.5 * line_length * tan(M_PI * (30.0 / 180.0)));
+	points_buffer.push_back(0.5 * line_length);
 	points_buffer.push_back(radius);
 	points_buffer.push_back(1);
 	points_buffer.push_back(0);
@@ -138,7 +139,7 @@ int main(int argc, char ** argv) {
 	listener.push_back(SoundProcessor::v3(0, 0, 0));
 	listener.push_back(SoundProcessor::v3(0, 1, 0));
 	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)), 0.5, 0));
-	listener.push_back(SoundProcessor::v3(0, 1, 1));
+	listener.push_back(SoundProcessor::v3(0.5 * tan(M_PI* (30.0 / 180.0)), 0.5, 0.333333 * sqrt(6)));
 
 	SoundProcessor soundProcessor(samplerate, listener);
 
@@ -400,8 +401,11 @@ int main(int argc, char ** argv) {
 
 		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STREAM_DRAW);
 
+//		if(count > listener.size())
+//			glDrawArrays(GL_LINES, 0, data.size() / 6);
+
 		if(count > listener.size())
-			glDrawArrays(GL_LINES, 0, data.size() / 6);
+			glDrawArrays(GL_POINTS, 0, data.size() / 6);
 
 		window->display();
 		TOCK("simulation_draw");
