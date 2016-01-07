@@ -59,7 +59,7 @@ std::vector<float> Client::getPoints() {
 
 		for (int i = 0; i < point_count; i++) {
 			v3 low = {0, 0, 1};
-			v3 high = {1, 0, 0};
+			v3 high = {0, 1, 0};
 			v3 color = {0, 0, 0};
 
 			for(int j = 0; j < 3; j++) {
