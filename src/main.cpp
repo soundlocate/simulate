@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cmath>
 #include <csignal>
+#include <fstream>
 
 #include <GL/glew.h>
 
@@ -19,7 +20,7 @@
 
 Server * server;
 
-constexpr int FREQUENCY_INCREMENT = 1;
+constexpr int FREQUENCY_INCREMENT = 0;
 
 typedef struct {
 	unsigned int vbo;
@@ -73,7 +74,7 @@ int glew_init() {
 
 int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_processor, float radius) {
 	int count = 4;
-	double line_length = 0.28;
+	double line_length = 1;
 
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
@@ -139,7 +140,7 @@ int main(int argc, char ** argv) {
 	listener.push_back(SoundProcessor::v3(0, 0, 0));
 	listener.push_back(SoundProcessor::v3(0, 1, 0));
 	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)), 0.5, 0));
-	listener.push_back(SoundProcessor::v3(0.5 * tan(M_PI* (30.0 / 180.0)), 0.5, 0.333333 * sqrt(6)));
+	listener.push_back(SoundProcessor::v3(tan((30.0 / 180.0) * M_PI) * (1.0 / 2.0), 1.0 / 2.0, 0.333333 * sqrt(6)));
 
 	SoundProcessor soundProcessor(samplerate, listener);
 
@@ -241,8 +242,16 @@ int main(int argc, char ** argv) {
 
 	float freq = 100;
 	auto now = std::chrono::high_resolution_clock::now();
+	auto lastTime = std::chrono::high_resolution_clock::now();
 
 	Stopwatch::getInstance().setCustomSignature(32435);
+
+	double aX = 0, aY = 0, sradius = 1;
+	double lastX = 0, lastY = 0, lastZ = 0;
+	int iterations;
+
+	std::ofstream outfile;
+	outfile.open ("test.csv");
 
 	while (window->open()) {
 		TICK("simulation_total");
@@ -301,7 +310,7 @@ int main(int argc, char ** argv) {
 						points_buffer.push_back(0);
 
 						ObjectInfo oinfo;
-						SoundProcessor::SoundObject * obj = new SoundProcessor::SoundObject(x, y, freq);
+						SoundProcessor::SoundObject * obj = new SoundProcessor::SoundObject(x, y, 0, freq);
 
 						oinfo.id = soundProcessor.add(obj);
 
@@ -352,6 +361,67 @@ int main(int argc, char ** argv) {
 		}
 
 		TOCK("simulation_process_events");
+
+		double duration = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock().now() - lastTime).count()) / 1000000000.0;
+
+		if(duration > 0.0005) {
+			lastTime = std::chrono::high_resolution_clock().now();
+
+			soundProcessor.remove(lastX, lastY);
+			if(iterations > 0)
+				points_buffer.erase(points_buffer.begin() + points_buffer.size() - 7, points_buffer.begin() + points_buffer.size() - 1);
+
+			double x = sradius * sin(aX) * sin(aY);
+			double y = sradius * cos(aX) * sin(aY);
+			double z = sradius * cos(aY);
+
+			x += 0.288675;
+			y += 0.5;
+			z += 0.204124;
+
+			points_buffer.push_back(x);
+			points_buffer.push_back(y);
+			points_buffer.push_back(radius);
+			points_buffer.push_back(0);
+			points_buffer.push_back(0);
+			points_buffer.push_back(0);
+
+			SoundProcessor::SoundObject * obj = new SoundProcessor::SoundObject(x, y, z, freq);
+
+			soundProcessor.add(obj);
+
+			lastX = x;
+			lastY = y;
+			lastZ = z;
+
+		    outfile << lastX << ", "
+					<< lastY << ", "
+					<< lastZ << std::endl;
+
+
+			aX += ((2.0 * M_PI) / 360.0) * 10.0;
+			if(iterations % 36 == 0) {
+				aY += ((2.0 * M_PI) / 360.0) * 10.0;
+			}
+            if(iterations % (36 * 36) == 0) {
+				sradius += 0.5;
+			}
+
+			iterations++;
+
+			glBindBuffer(GL_ARRAY_BUFFER, points.vbo);
+			glBufferData(GL_ARRAY_BUFFER, 6 * count * sizeof(float), points_buffer.data(), GL_STREAM_DRAW);
+		}
+
+/*		if(fmod(duration, 0.2) > 0.175 && client.buffer != nullptr) {
+		    outfile << lastX << ", "
+				  << lastY << ", "
+				  << lastZ << ", "
+				  << client.buffer[0] << ", "
+				  << client.buffer[1] << ", "
+				  << client.buffer[2] << std::endl;
+
+				  }*/
 
 		double time = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock().now() - now).count()) / 1000000000.0;
 		now = std::chrono::high_resolution_clock().now();

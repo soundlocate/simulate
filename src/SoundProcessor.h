@@ -37,6 +37,13 @@ public:
 			this->y = y;
 			this->freq = freq;
 		};
+
+	    SoundObject(float x, float y, float z, float freq) {
+			this->x = x;
+			this->y = y;
+			this->z = z;
+			this->freq = freq;
+		};
 	};
 
 

@@ -55,6 +55,11 @@ std::vector<float> Client::getPoints() {
 			return m_points;
 		}
 
+		if(buffer != nullptr)
+			free(buffer);
+
+		buffer = receive_buffer;
+
 		m_points.erase(m_points.begin(), m_points.end());
 
 		for (int i = 0; i < point_count; i++) {

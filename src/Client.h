@@ -11,6 +11,7 @@ public:
 
 	std::vector<float> getPoints();
 
+	double * buffer = nullptr;
 private:
 	union v3 {
 		struct {
