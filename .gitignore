@@ -208,3 +208,4 @@ tramp
 cmake_install.cmake
 compile_commands.json
 todo.org
+*.csv

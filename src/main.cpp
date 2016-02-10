@@ -357,18 +357,12 @@ int main(int argc, char ** argv) {
 		now = std::chrono::high_resolution_clock().now();
 		unsigned int samples = (float) samplerate * time;
 
-		//std::cout << __PRETTY_FUNCTION__ << ": samples = " << samples;
-
 		TICK("simulation_generate_samples");
 
 		double * current_samples = soundProcessor.sample(samples);
 
 		TOCK("simulation_generate_samples");
-/*
-		for(int i = 0; i < samples * listener.size(); i++) {
-			std::cout << current_samples[i] << std::endl;
-		}
-*/
+
 		server->send(current_samples, samples * listener.size());
 
 		free(current_samples);
@@ -376,8 +370,6 @@ int main(int argc, char ** argv) {
 
 		TICK("simulation_draw");
 
-//		glBindBuffer(GL_ARRAY_BUFFER,  points.vbo);
-//		shaderProgram->useProgram();
 	    glBindVertexArray(points.vao);
 
 		shaderProgram->uniform2f("center", centerX - mouseDXScreen, centerY - mouseDYScreen);
@@ -395,14 +387,8 @@ int main(int argc, char ** argv) {
 		lines_buffer.insert(lines_buffer.begin(), data.begin(), data.end());
 
 		glBindBuffer(GL_ARRAY_BUFFER, lines.vbo);
-//		glBufferData(GL_ARRAY_BUFFER, lines_buffer.size() * sizeof(float), lines_buffer.data(), GL_STREAM_DRAW);
-
-//		glDrawArrays(GL_LINES, 0, lines_buffer.size() / 6);
 
 		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STREAM_DRAW);
-
-//		if(count > listener.size())
-//			glDrawArrays(GL_LINES, 0, data.size() / 6);
 
 		if(count > listener.size())
 			glDrawArrays(GL_POINTS, 0, data.size() / 6);
