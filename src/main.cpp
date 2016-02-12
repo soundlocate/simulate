@@ -254,7 +254,7 @@ int main(int argc, char ** argv) {
 	int iterations;
 
 	std::ofstream outfile;
-	outfile.open ("freq_high_res.csv");
+	outfile.open ("pos_high_res.csv");
 
 	//PosClient posclient(argv[4], std::atoi(argv[5]));
 
@@ -409,12 +409,12 @@ int main(int argc, char ** argv) {
 			lastY = y;
 			lastZ = z;
 
-			aX += ((2.0 * M_PI) / 360.0) * 10.0;
-			if(iterations % 36 == 0) {
+			aX += ((2.0 * M_PI) / 360.0) * 2.0;
+			if(iterations % 180 == 0) {
 				aY += ((2.0 * M_PI) / 360.0) * 10.0;
 			}
-            if(iterations % (36 * 36) == 0) {
-				freq += 25;
+            if(iterations % (180 * 180) == 0) {
+				sradius += 0.5;
 			}
 
 			iterations++;
