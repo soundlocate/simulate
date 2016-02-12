@@ -411,7 +411,7 @@ int main(int argc, char ** argv) {
 
 			aX += ((2.0 * M_PI) / 360.0) * 2.0;
 			if(iterations % 180 == 0) {
-				aY += ((2.0 * M_PI) / 360.0) * 10.0;
+				aY += ((2.0 * M_PI) / 360.0) * 2.0;
 			}
             if(iterations % (180 * 180) == 0) {
 				sradius += 0.5;
