@@ -243,20 +243,20 @@ int main(int argc, char ** argv) {
 	screenSizeX = window->getSize().x;
 	screenSizeY = window->getSize().y;
 
-	float freq = 100;
+	float freq = 500;
 	auto now = std::chrono::high_resolution_clock::now();
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
 	Stopwatch::getInstance().setCustomSignature(32435);
 
-	double aX = 0, aY = 0, sradius = 1;
+	double aX = 0, aY = 0, sradius = 1.4;
 	double lastX = 0, lastY = 0, lastZ = 0;
 	int iterations;
 
 	std::ofstream outfile;
-	outfile.open ("test.csv");
+	outfile.open ("freq_high_res.csv");
 
-	PosClient posclient(argv[4], std::atoi(argv[5]));
+	//PosClient posclient(argv[4], std::atoi(argv[5]));
 
 	while (window->open()) {
 		TICK("simulation_total");
@@ -369,7 +369,7 @@ int main(int argc, char ** argv) {
 
 		double duration = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock().now() - lastTime).count()) / 1000000000.0;
 
-		if(duration > 0.0005) {
+		if(duration > 2) {
 			if(client.buffer != nullptr) {
 				outfile << lastX << ", "
 						<< lastY << ", "
@@ -403,7 +403,7 @@ int main(int argc, char ** argv) {
 
 			SoundProcessor::SoundObject * obj = new SoundProcessor::SoundObject(x, y, z, freq);
 			soundProcessor.add(obj);
-			posclient.setPosition(x, y, z);
+//			posclient.setPosition(x, y, z);
 
 			lastX = x;
 			lastY = y;
@@ -414,7 +414,7 @@ int main(int argc, char ** argv) {
 				aY += ((2.0 * M_PI) / 360.0) * 10.0;
 			}
             if(iterations % (36 * 36) == 0) {
-				sradius += 0.5;
+				freq += 25;
 			}
 
 			iterations++;
