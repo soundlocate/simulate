@@ -17,6 +17,7 @@
 #include "SoundProcessor.h"
 #include "Server.h"
 #include "Client.h"
+#include "PosClient.h"
 
 Server * server;
 
@@ -74,7 +75,7 @@ int glew_init() {
 
 int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_processor, float radius) {
 	int count = 4;
-	double line_length = 1;
+	double line_length = 0.28;
 
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
@@ -137,10 +138,12 @@ int main(int argc, char ** argv) {
 	std::signal(SIGINT, terminate);
 	std::signal(SIGABRT, terminate);
 
+
+	double distBetween = 0.28;
 	listener.push_back(SoundProcessor::v3(0, 0, 0));
-	listener.push_back(SoundProcessor::v3(0, 1, 0));
-	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)), 0.5, 0));
-	listener.push_back(SoundProcessor::v3(tan((30.0 / 180.0) * M_PI) * (1.0 / 2.0), 1.0 / 2.0, 0.333333 * sqrt(6)));
+	listener.push_back(SoundProcessor::v3(0, distBetween, 0));
+	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)) * distBetween, 0.5 * distBetween, 0));
+	listener.push_back(SoundProcessor::v3(tan((30.0 / 180.0) * M_PI) * (distBetween / 2.0), distBetween / 2.0, distBetween * 0.333333 * sqrt(6)));
 
 	SoundProcessor soundProcessor(samplerate, listener);
 
@@ -252,6 +255,8 @@ int main(int argc, char ** argv) {
 
 	std::ofstream outfile;
 	outfile.open ("test.csv");
+
+	PosClient posclient(argv[4], std::atoi(argv[5]));
 
 	while (window->open()) {
 		TICK("simulation_total");
@@ -365,6 +370,16 @@ int main(int argc, char ** argv) {
 		double duration = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock().now() - lastTime).count()) / 1000000000.0;
 
 		if(duration > 0.0005) {
+			if(client.buffer != nullptr) {
+				outfile << lastX << ", "
+						<< lastY << ", "
+						<< lastZ << ", "
+						<< client.buffer[0] << ", "
+						<< client.buffer[1] << ", "
+						<< client.buffer[2] << std::endl;
+			}
+
+
 			lastTime = std::chrono::high_resolution_clock().now();
 
 			soundProcessor.remove(lastX, lastY);
@@ -375,9 +390,9 @@ int main(int argc, char ** argv) {
 			double y = sradius * cos(aX) * sin(aY);
 			double z = sradius * cos(aY);
 
-			x += 0.288675;
-			y += 0.5;
-			z += 0.204124;
+			x += 0.080829;
+			y += 0.14;
+			z += 0.0571548;
 
 			points_buffer.push_back(x);
 			points_buffer.push_back(y);
@@ -387,17 +402,12 @@ int main(int argc, char ** argv) {
 			points_buffer.push_back(0);
 
 			SoundProcessor::SoundObject * obj = new SoundProcessor::SoundObject(x, y, z, freq);
-
 			soundProcessor.add(obj);
+			posclient.setPosition(x, y, z);
 
 			lastX = x;
 			lastY = y;
 			lastZ = z;
-
-		    outfile << lastX << ", "
-					<< lastY << ", "
-					<< lastZ << std::endl;
-
 
 			aX += ((2.0 * M_PI) / 360.0) * 10.0;
 			if(iterations % 36 == 0) {
@@ -412,16 +422,6 @@ int main(int argc, char ** argv) {
 			glBindBuffer(GL_ARRAY_BUFFER, points.vbo);
 			glBufferData(GL_ARRAY_BUFFER, 6 * count * sizeof(float), points_buffer.data(), GL_STREAM_DRAW);
 		}
-
-/*		if(fmod(duration, 0.2) > 0.175 && client.buffer != nullptr) {
-		    outfile << lastX << ", "
-				  << lastY << ", "
-				  << lastZ << ", "
-				  << client.buffer[0] << ", "
-				  << client.buffer[1] << ", "
-				  << client.buffer[2] << std::endl;
-
-				  }*/
 
 		double time = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock().now() - now).count()) / 1000000000.0;
 		now = std::chrono::high_resolution_clock().now();
