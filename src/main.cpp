@@ -251,12 +251,12 @@ int main(int argc, char ** argv) {
 
 	double aX = 0, aY = 0, sradius = 1.4;
 	double lastX = 0, lastY = 0, lastZ = 0;
-	int iterations;
+	int iterations = 0;
 
 	std::ofstream outfile;
-	outfile.open ("pos_high_res.csv");
+	outfile.open ("real_cool.csv");
 
-	//PosClient posclient(argv[4], std::atoi(argv[5]));
+	PosClient posclient(argv[4], std::atoi(argv[5]));
 
 	while (window->open()) {
 		TICK("simulation_total");
@@ -384,11 +384,15 @@ int main(int argc, char ** argv) {
 
 			soundProcessor.remove(lastX, lastY);
 			if(iterations > 0)
-				points_buffer.erase(points_buffer.begin() + points_buffer.size() - 7, points_buffer.begin() + points_buffer.size() - 1);
-
+				points_buffer.erase(points_buffer.begin() + points_buffer.size() - 6, points_buffer.end());
+/*
 			double x = sradius * sin(aX) * sin(aY);
 			double y = sradius * cos(aX) * sin(aY);
 			double z = sradius * cos(aY);
+*/
+			double x = sradius * sin(aX);
+			double y = sradius * cos(aX);
+			double z = 0.0571548;
 
 			x += 0.080829;
 			y += 0.14;
@@ -403,7 +407,7 @@ int main(int argc, char ** argv) {
 
 			SoundProcessor::SoundObject * obj = new SoundProcessor::SoundObject(x, y, z, freq);
 			soundProcessor.add(obj);
-//			posclient.setPosition(x, y, z);
+			posclient.setPosition(x, y, z);
 
 			lastX = x;
 			lastY = y;
