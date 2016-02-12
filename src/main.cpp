@@ -251,10 +251,10 @@ int main(int argc, char ** argv) {
 
 	double aX = 0, aY = 0, sradius = 1;
 	double lastX = 0, lastY = 0, lastZ = 0;
-	int iterations;
+	int iterations = 0;
 
 	std::ofstream outfile;
-	outfile.open ("test.csv");
+	outfile.open ("real_cool.csv");
 
 	PosClient posclient(argv[4], std::atoi(argv[5]));
 
@@ -369,7 +369,7 @@ int main(int argc, char ** argv) {
 
 		double duration = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock().now() - lastTime).count()) / 1000000000.0;
 
-		if(duration > 0.0005) {
+		if(duration > 2) {
 			if(client.buffer != nullptr) {
 				outfile << lastX << ", "
 						<< lastY << ", "
@@ -384,11 +384,15 @@ int main(int argc, char ** argv) {
 
 			soundProcessor.remove(lastX, lastY);
 			if(iterations > 0)
-				points_buffer.erase(points_buffer.begin() + points_buffer.size() - 7, points_buffer.begin() + points_buffer.size() - 1);
-
+				points_buffer.erase(points_buffer.begin() + points_buffer.size() - 6, points_buffer.end());
+/*
 			double x = sradius * sin(aX) * sin(aY);
 			double y = sradius * cos(aX) * sin(aY);
 			double z = sradius * cos(aY);
+*/
+			double x = sradius * sin(aX);
+			double y = sradius * cos(aX);
+			double z = 0.0571548;
 
 			x += 0.080829;
 			y += 0.14;
