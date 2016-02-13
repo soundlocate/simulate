@@ -249,7 +249,7 @@ int main(int argc, char ** argv) {
 
 	Stopwatch::getInstance().setCustomSignature(32435);
 
-	double aX = 0, aY = 0, sradius = 1;
+	double aX = 0, aY = 0, sradius = 0.5;
 	double lastX = 0, lastY = 0, lastZ = 0;
 	int iterations = 0;
 
@@ -257,6 +257,8 @@ int main(int argc, char ** argv) {
 	outfile.open ("real_cool.csv");
 
 	PosClient posclient(argv[4], std::atoi(argv[5]));
+
+	count++;
 
 	while (window->open()) {
 		TICK("simulation_total");
@@ -369,14 +371,15 @@ int main(int argc, char ** argv) {
 
 		double duration = (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock().now() - lastTime).count()) / 1000000000.0;
 
-		if(duration > 2) {
+		if(duration > 5) {
 			if(client.buffer != nullptr) {
 				outfile << lastX << ", "
 						<< lastY << ", "
 						<< lastZ << ", "
 						<< client.buffer[0] << ", "
 						<< client.buffer[1] << ", "
-						<< client.buffer[2] << std::endl;
+						<< client.buffer[2]
+						<< std::endl;
 			}
 
 
@@ -384,7 +387,7 @@ int main(int argc, char ** argv) {
 
 			soundProcessor.remove(lastX, lastY);
 			if(iterations > 0)
-				points_buffer.erase(points_buffer.begin() + points_buffer.size() - 6, points_buffer.end());
+				points_buffer.erase(points_buffer.begin() + points_buffer.size() - 7, points_buffer.begin() + points_buffer.size() - 1);
 /*
 			double x = sradius * sin(aX) * sin(aY);
 			double y = sradius * cos(aX) * sin(aY);
@@ -413,12 +416,12 @@ int main(int argc, char ** argv) {
 			lastY = y;
 			lastZ = z;
 
-			aX += ((2.0 * M_PI) / 360.0) * 10.0;
-			if(iterations % 36 == 0) {
-				aY += ((2.0 * M_PI) / 360.0) * 10.0;
+			aX += ((2.0 * M_PI) / 360.0) * 2.0;
+			if(iterations % 180 == 0) {
+				//aY += ((2.0 * M_PI) / 360.0) * 10.0;
+				sradius += 0.1;
 			}
             if(iterations % (36 * 36) == 0) {
-				sradius += 0.5;
 			}
 
 			iterations++;
