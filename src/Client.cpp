@@ -45,8 +45,6 @@ std::vector<float> Client::getPoints() {
 		to_receive = sizeof(double) * 3 * point_count;
 		receive_buffer = (double *) malloc(to_receive);
 
-  		std::cout << "going to receive " << point_count << " points" << std::endl;
-
 	    client->receive(receive_buffer, to_receive, received);
 
 		if(received != to_receive) {
