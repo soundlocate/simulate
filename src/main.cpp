@@ -136,6 +136,8 @@ int main(int argc, char ** argv) {
 	std::signal(SIGINT, terminate);
 	std::signal(SIGABRT, terminate);
 
+//	double distBetween = 0.28;
+
 	listener.push_back(SoundProcessor::v3(0, 0, 0));
 	listener.push_back(SoundProcessor::v3(0, 1, 0));
 	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)), 0.5, 0));
@@ -244,6 +246,8 @@ int main(int argc, char ** argv) {
 
 	Stopwatch::getInstance().setCustomSignature(32435);
 
+	int id = 0;
+
 	while (window->open()) {
 		TICK("simulation_total");
 		TICK("simulation_process_events");
@@ -254,6 +258,15 @@ int main(int argc, char ** argv) {
 			switch (event.type) {
 			case sf::Event::Closed: {
 				window->close();
+				break;
+			}
+			case sf::Event::KeyPressed: {
+				if(event.key.code == sf::Keyboard::Space && client.buffer != nullptr) {
+					std::cout << id++ << ", "
+							  << client.buffer[0] << ", "
+							  << client.buffer[1] << ", "
+							  << client.buffer[2] << std::endl;
+				}
 				break;
 			}
 			case sf::Event::Resized: {
@@ -390,7 +403,8 @@ int main(int argc, char ** argv) {
 
 		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STREAM_DRAW);
 
-		if(count > listener.size())
+		// Todo(robin): better solution!!
+		//if(count > listener.size())
 			glDrawArrays(GL_POINTS, 0, data.size() / 6);
 
 		window->display();
