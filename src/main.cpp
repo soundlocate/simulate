@@ -73,7 +73,7 @@ int glew_init() {
 
 int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_processor, float radius) {
 	int count = 4;
-	double line_length = 0.28;
+	double line_length = 1;
 
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);

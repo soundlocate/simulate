@@ -209,3 +209,7 @@ cmake_install.cmake
 compile_commands.json
 todo.org
 *.csv
+file.dat
+random.svg
+real.png
+real.svg
