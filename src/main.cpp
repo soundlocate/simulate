@@ -72,8 +72,43 @@ int glew_init() {
 }
 
 int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_processor, float radius) {
-	int count = 4;
-	double line_length = 1;
+	int count = 8;
+	double line_length = 0.28 * 2;
+
+	double dx = 0, dy = 0, dz = 0;
+
+	double pos[4 * 3] = {
+		0, 0, 0,
+		0, 1, 0,
+		sin(M_PI * 0.333333), 0.5, 0,
+		0.5 * tan(M_PI * 0.161616), 0.5, 0.333333 * sqrt(6)
+	};
+
+	for(int i = 0; i < 4; i++) {
+		dx += pos[3 * i] * line_length;
+		dy += pos[3 * i + 1] * line_length;
+		dz += pos[3 * i + 2] * line_length;
+	}
+
+	dx /= 4;
+	dy /= 4;
+	dz /= 4;
+
+	double tx = 0, ty = 0, tz = 0;
+
+	for(int i = 0; i < 4; i++) {
+		tx += pos[3 * i] * line_length * 0.5;
+		ty += pos[3 * i + 1] * line_length * 0.5;
+		tz += pos[3 * i + 2] * line_length * 0.5;
+	}
+
+	tx /= 4;
+	ty /= 4;
+	tz /= 4;
+
+	dx -= tx;
+	dy -= ty;
+	dz -= tz;
 
 	points_buffer.push_back(0);
 	points_buffer.push_back(0);
@@ -98,6 +133,36 @@ int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_proc
 
 	points_buffer.push_back(0.5 * line_length * tan(M_PI * (30.0 / 180.0)));
 	points_buffer.push_back(0.5 * line_length);
+	points_buffer.push_back(radius);
+	points_buffer.push_back(1);
+	points_buffer.push_back(0);
+	points_buffer.push_back(0);
+
+	line_length = 0.28;
+
+	points_buffer.push_back(dx + 0);
+	points_buffer.push_back(dy + 0);
+	points_buffer.push_back(radius);
+	points_buffer.push_back(1);
+	points_buffer.push_back(0);
+	points_buffer.push_back(0);
+
+	points_buffer.push_back(dx + 0);
+	points_buffer.push_back(dy + 1 * line_length);
+	points_buffer.push_back(radius);
+	points_buffer.push_back(1);
+	points_buffer.push_back(0);
+	points_buffer.push_back(0);
+
+	points_buffer.push_back(dx + sin(M_PI * (60.0 / 180.0)) * line_length);
+	points_buffer.push_back(dy + 0.5 * line_length);
+	points_buffer.push_back(radius);
+	points_buffer.push_back(1);
+	points_buffer.push_back(0);
+	points_buffer.push_back(0);
+
+	points_buffer.push_back(dx + 0.5 * line_length * tan(M_PI * (30.0 / 180.0)));
+	points_buffer.push_back(dy + 0.5 * line_length);
 	points_buffer.push_back(radius);
 	points_buffer.push_back(1);
 	points_buffer.push_back(0);
@@ -136,12 +201,73 @@ int main(int argc, char ** argv) {
 	std::signal(SIGINT, terminate);
 	std::signal(SIGABRT, terminate);
 
-//	double distBetween = 0.28;
+	double distBetween = 0.42;
+
+	double dx = 0, dy = 0, dz = 0;
+
+	double pos[4 * 3] = {
+		0, 0, 0,
+		0, 1, 0,
+		sin(M_PI * 0.333333), 0.5, 0,
+		0.5 * tan(M_PI * 0.161616), 0.5, 0.333333 * sqrt(6)
+	};
+
+	for(int i = 0; i < 4; i++) {
+		dx += pos[3 * i] * distBetween;
+		dy += pos[3 * i + 1] * distBetween;
+		dz += pos[3 * i + 2] * distBetween;
+	}
+
+	dx /= 4;
+	dy /= 4;
+	dz /= 4;
+
+	double tx = 0, ty = 0, tz = 0;
+
+	for(int i = 0; i < 4; i++) {
+		tx += pos[3 * i] * distBetween * 0.5;
+		ty += pos[3 * i + 1] * distBetween * 0.5;
+		tz += pos[3 * i + 2] * distBetween * 0.5;
+	}
+
+	tx /= 4;
+	ty /= 4;
+	tz /= 4;
+
+	dx -= tx;
+	dy -= ty;
+	dz -= tz;
+/*
+	listener.push_back(SoundProcessor::v3(0, 0, 0));
+	listener.push_back(SoundProcessor::v3(0, distBetween, 0));
+	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)) * distBetween, 0.5 * distBetween, 0));
+	listener.push_back(SoundProcessor::v3(0.5 * tan(M_PI* (30.0 / 180.0)) * distBetween, 0.5 * distBetween, 0.333333 * distBetween * sqrt(6)));
+
+	distBetween = 0.28;
+
+	listener.push_back(SoundProcessor::v3(dx, dy, dz));
+	listener.push_back(SoundProcessor::v3(dx + 0, dy + distBetween, dz));
+	listener.push_back(SoundProcessor::v3(dx + sin(M_PI* (60.0 / 180.0)) * distBetween, dy + 0.5 * distBetween, dz));
+	listener.push_back(SoundProcessor::v3(dx + 0.5 * tan(M_PI* (30.0 / 180.0)) * distBetween, dy +  0.5 * distBetween, dz - 0.333333 * distBetween * sqrt(6)));
+*/
 
 	listener.push_back(SoundProcessor::v3(0, 0, 0));
-	listener.push_back(SoundProcessor::v3(0, 1, 0));
-	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)), 0.5, 0));
-	listener.push_back(SoundProcessor::v3(0.5 * tan(M_PI* (30.0 / 180.0)), 0.5, 0.333333 * sqrt(6)));
+	listener.push_back(SoundProcessor::v3(0.0, distBetween, 0));
+	listener.push_back(SoundProcessor::v3(distBetween, 0.0, 0.0));
+	listener.push_back(SoundProcessor::v3(distBetween, distBetween, 0));
+	listener.push_back(SoundProcessor::v3(0.0, 0.0, distBetween));
+	listener.push_back(SoundProcessor::v3(distBetween, 0.0, distBetween));
+	listener.push_back(SoundProcessor::v3(0.0, distBetween, distBetween));
+	listener.push_back(SoundProcessor::v3(distBetween, distBetween, distBetween));
+
+	std::cout << "mics: [" << std::endl;
+	for(auto l : listener) {
+		std::cout << "[" << l.x << ", "
+				  << l.y << ", "
+				  << l.z << "]" << std::endl;
+
+	}
+	std::cout << "]" << std::endl;
 
 	SoundProcessor soundProcessor(samplerate, listener);
 
