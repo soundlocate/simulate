@@ -1,13 +1,13 @@
-#ifndef _CLIENT_H
-#define _CLIENT_H
+#ifndef _GUISERVER_H
+#define _GUISERVER_H
 
 #include <SFML/Network.hpp>
 #include <iostream>
 #include <thread>
 
-class Client {
+class GuiServer {
 public:
-	Client(const char * ip, unsigned short port);
+    GuiServer(unsigned short port);
 
 	std::vector<float> getPoints();
 

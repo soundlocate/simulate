@@ -1,9 +1,9 @@
-#include "Client.h"
+#include "GuiServer.h"
 
-Client::Client(const char * ip, unsigned short port) {
+GuiServer::GuiServer(unsigned short port) {
 	m_socket = new sf::TcpListener();
 
-	std::cout << "binding to " << ip << ":" << port << std::endl;
+	std::cout << "binding to " << port << std::endl;
 
 	m_socket->listen(port);
 
@@ -22,7 +22,7 @@ Client::Client(const char * ip, unsigned short port) {
 		}).detach();
 }
 
-std::vector<float> Client::getPoints() {
+std::vector<float> GuiServer::getPoints() {
 	unsigned int point_count = 0;
 	std::size_t received, to_receive;
 	double * receive_buffer;
@@ -76,7 +76,7 @@ std::vector<float> Client::getPoints() {
 	return std::vector<float>(m_points);
 }
 
-int Client::m_new_point(float x, float y, v3 color) {
+int GuiServer::m_new_point(float x, float y, v3 color) {
 /*  m_points.push_back(x);
 	m_points.push_back(-1000);
 	m_points.push_back(1);

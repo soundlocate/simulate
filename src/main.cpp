@@ -15,11 +15,12 @@
 #include "ShaderProgram.h"
 #include "SoundProcessor.h"
 #include "Server.h"
-#include "Client.h"
+#include "GuiServer.h"
+#include "CommandLineOptions.h"
 
 Server * server;
 
-constexpr int FREQUENCY_INCREMENT = 1;
+int FREQUENCY_INCREMENT = 1;
 
 typedef struct {
 	unsigned int vbo;
@@ -73,100 +74,63 @@ int glew_init() {
 
 int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_processor, float radius) {
 	int count = 8;
-	double line_length = 0.28 * 2;
+	double line_length = 0.42;
 
-	double dx = 0, dy = 0, dz = 0;
-
-	double pos[4 * 3] = {
-		0, 0, 0,
-		0, 1, 0,
-		sin(M_PI * 0.333333), 0.5, 0,
-		0.5 * tan(M_PI * 0.161616), 0.5, 0.333333 * sqrt(6)
-	};
-
-	for(int i = 0; i < 4; i++) {
-		dx += pos[3 * i] * line_length;
-		dy += pos[3 * i + 1] * line_length;
-		dz += pos[3 * i + 2] * line_length;
-	}
-
-	dx /= 4;
-	dy /= 4;
-	dz /= 4;
-
-	double tx = 0, ty = 0, tz = 0;
-
-	for(int i = 0; i < 4; i++) {
-		tx += pos[3 * i] * line_length * 0.5;
-		ty += pos[3 * i + 1] * line_length * 0.5;
-		tz += pos[3 * i + 2] * line_length * 0.5;
-	}
-
-	tx /= 4;
-	ty /= 4;
-	tz /= 4;
-
-	dx -= tx;
-	dy -= ty;
-	dz -= tz;
-
-	points_buffer.push_back(0);
-	points_buffer.push_back(0);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(0.0);
 	points_buffer.push_back(radius);
-	points_buffer.push_back(1);
-	points_buffer.push_back(0);
-	points_buffer.push_back(0);
+	points_buffer.push_back(1.0);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(0.0);
 
-	points_buffer.push_back(0);
-	points_buffer.push_back(1 * line_length);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(line_length);
 	points_buffer.push_back(radius);
-	points_buffer.push_back(1);
-	points_buffer.push_back(0);
-	points_buffer.push_back(0);
+	points_buffer.push_back(1.0);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(0.0);
 
-	points_buffer.push_back(sin(M_PI * (60.0 / 180.0)) * line_length);
-	points_buffer.push_back(0.5 * line_length);
+	points_buffer.push_back(line_length);
+	points_buffer.push_back(0.0);
 	points_buffer.push_back(radius);
-	points_buffer.push_back(1);
-	points_buffer.push_back(0);
-	points_buffer.push_back(0);
+	points_buffer.push_back(1.0);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(0.0);
 
-	points_buffer.push_back(0.5 * line_length * tan(M_PI * (30.0 / 180.0)));
-	points_buffer.push_back(0.5 * line_length);
+	points_buffer.push_back(line_length);
+	points_buffer.push_back(line_length);
 	points_buffer.push_back(radius);
-	points_buffer.push_back(1);
-	points_buffer.push_back(0);
-	points_buffer.push_back(0);
+	points_buffer.push_back(1.0);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(0.0);
 
-	line_length = 0.28;
-
-	points_buffer.push_back(dx + 0);
-	points_buffer.push_back(dy + 0);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(0.0);
 	points_buffer.push_back(radius);
-	points_buffer.push_back(1);
-	points_buffer.push_back(0);
-	points_buffer.push_back(0);
+	points_buffer.push_back(1.0);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(0.0);
 
-	points_buffer.push_back(dx + 0);
-	points_buffer.push_back(dy + 1 * line_length);
+	points_buffer.push_back(line_length);
+	points_buffer.push_back(0.0);
 	points_buffer.push_back(radius);
-	points_buffer.push_back(1);
-	points_buffer.push_back(0);
-	points_buffer.push_back(0);
+	points_buffer.push_back(1.0);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(0.0);
 
-	points_buffer.push_back(dx + sin(M_PI * (60.0 / 180.0)) * line_length);
-	points_buffer.push_back(dy + 0.5 * line_length);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(line_length);
 	points_buffer.push_back(radius);
-	points_buffer.push_back(1);
-	points_buffer.push_back(0);
-	points_buffer.push_back(0);
+	points_buffer.push_back(1.0);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(0.0);
 
-	points_buffer.push_back(dx + 0.5 * line_length * tan(M_PI * (30.0 / 180.0)));
-	points_buffer.push_back(dy + 0.5 * line_length);
+	points_buffer.push_back(line_length);
+	points_buffer.push_back(line_length);
 	points_buffer.push_back(radius);
-	points_buffer.push_back(1);
-	points_buffer.push_back(0);
-	points_buffer.push_back(0);
+	points_buffer.push_back(1.0);
+	points_buffer.push_back(0.0);
+	points_buffer.push_back(0.0);
 
 	return count;
 }
@@ -203,53 +167,7 @@ int main(int argc, char ** argv) {
 
 	double distBetween = 0.42;
 
-	double dx = 0, dy = 0, dz = 0;
-
-	double pos[4 * 3] = {
-		0, 0, 0,
-		0, 1, 0,
-		sin(M_PI * 0.333333), 0.5, 0,
-		0.5 * tan(M_PI * 0.161616), 0.5, 0.333333 * sqrt(6)
-	};
-
-	for(int i = 0; i < 4; i++) {
-		dx += pos[3 * i] * distBetween;
-		dy += pos[3 * i + 1] * distBetween;
-		dz += pos[3 * i + 2] * distBetween;
-	}
-
-	dx /= 4;
-	dy /= 4;
-	dz /= 4;
-
-	double tx = 0, ty = 0, tz = 0;
-
-	for(int i = 0; i < 4; i++) {
-		tx += pos[3 * i] * distBetween * 0.5;
-		ty += pos[3 * i + 1] * distBetween * 0.5;
-		tz += pos[3 * i + 2] * distBetween * 0.5;
-	}
-
-	tx /= 4;
-	ty /= 4;
-	tz /= 4;
-
-	dx -= tx;
-	dy -= ty;
-	dz -= tz;
-/*
-	listener.push_back(SoundProcessor::v3(0, 0, 0));
-	listener.push_back(SoundProcessor::v3(0, distBetween, 0));
-	listener.push_back(SoundProcessor::v3(sin(M_PI* (60.0 / 180.0)) * distBetween, 0.5 * distBetween, 0));
-	listener.push_back(SoundProcessor::v3(0.5 * tan(M_PI* (30.0 / 180.0)) * distBetween, 0.5 * distBetween, 0.333333 * distBetween * sqrt(6)));
-
-	distBetween = 0.28;
-
-	listener.push_back(SoundProcessor::v3(dx, dy, dz));
-	listener.push_back(SoundProcessor::v3(dx + 0, dy + distBetween, dz));
-	listener.push_back(SoundProcessor::v3(dx + sin(M_PI* (60.0 / 180.0)) * distBetween, dy + 0.5 * distBetween, dz));
-	listener.push_back(SoundProcessor::v3(dx + 0.5 * tan(M_PI* (30.0 / 180.0)) * distBetween, dy +  0.5 * distBetween, dz - 0.333333 * distBetween * sqrt(6)));
-*/
+	CommandLineOptions options(argc, argv);
 
 	listener.push_back(SoundProcessor::v3(0, 0, 0));
 	listener.push_back(SoundProcessor::v3(0.0, distBetween, 0));
@@ -275,14 +193,14 @@ int main(int argc, char ** argv) {
 
 	int listener_count = init_listeners(points_buffer, soundProcessor, radius);
 
-	server = new Server(atoi(argv[1]), [listener](sf::TcpSocket * socket) {
+	server = new Server(options.audioPort(), [listener](sf::TcpSocket * socket) {
 			unsigned int size = listener.size();
 
 			socket->send(&size, sizeof(int));
 			std::cout << "client connected: " << socket->getRemoteAddress() << ":" << socket->getRemotePort() << std::endl;
 		});
 
-	Client client(argv[2], atoi(argv[3]));
+    GuiServer gserver(options.guiPort());
 
 	count = listener.size();
 
@@ -387,11 +305,11 @@ int main(int argc, char ** argv) {
 				break;
 			}
 			case sf::Event::KeyPressed: {
-				if(event.key.code == sf::Keyboard::Space && client.buffer != nullptr) {
+				if(event.key.code == sf::Keyboard::Space && gserver.buffer != nullptr) {
 					std::cout << id++ << ", "
-							  << client.buffer[0] << ", "
-							  << client.buffer[1] << ", "
-							  << client.buffer[2] << std::endl;
+							  << gserver.buffer[0] << ", "
+							  << gserver.buffer[1] << ", "
+							  << gserver.buffer[2] << std::endl;
 				}
 				break;
 			}
@@ -520,7 +438,7 @@ int main(int argc, char ** argv) {
 
 		glBindVertexArray(lines.vao);
 
-		std::vector<float> data = client.getPoints();
+		std::vector<float> data = gserver.getPoints();
 
 		lines_buffer.clear();
 		lines_buffer.insert(lines_buffer.begin(), data.begin(), data.end());

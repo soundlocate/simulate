@@ -19,6 +19,7 @@
 #define APPLICATION_VENDOR_ID          "de.sfn_kassel"
 #define APPLICATION_VENDOR_NAME        "SFN Kassel (Robin Heinemann, Jaro Habiger)"
 #define APPLICATION_VENDOR_URL         "www.sfn-kassel.de"
+#define APPLICATION_VENDOR_EMAIL       "schallortung@gmail.com"
 #define APPLICATION_ID                 "de.sfn_kassel"
 
 #ifndef APPLICATION_NAME
