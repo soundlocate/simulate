@@ -33,7 +33,7 @@ double * SoundProcessor::sample(int count) {
 
 	int k = 0;
 
-	int dists[4] = {0};
+	int * dists = new int[m_dists.size()];
 
 	for(int i = 0; i < count; i++) {
 		m_samples++;
@@ -52,12 +52,22 @@ double * SoundProcessor::sample(int count) {
 				}
 			}
 
+// Test fliped phase
+//			if(j == 0) {
+//				value *= -1;
+//			}
+
 			ret[k++] = value / ((m_objs.size() != 0) ? m_objs.size() : 1);
 		}
 
-		if(i == 0) {
-//			std::cout << "dx12 " << m_speed * (float) ((float) (dists[0] - dists[1]) / (float) m_samplerate) << std::endl;
-//			std::cout << "dx13 " << m_speed * (float) ((float) (dists[0] - dists[2]) / (float) m_samplerate) << std::endl;
+		if(i == -1) {
+			std::cout << "dx12 " << m_speed * (float) ((float) (dists[0] - dists[1]) / (float) m_samplerate) << std::endl;
+			std::cout << "dx13 " << m_speed * (float) ((float) (dists[0] - dists[2]) / (float) m_samplerate) << std::endl;
+			std::cout << "dx14 " << m_speed * (float) ((float) (dists[0] - dists[3]) / (float) m_samplerate) << std::endl;
+			std::cout << "dx15 " << m_speed * (float) ((float) (dists[0] - dists[4]) / (float) m_samplerate) << std::endl;
+			std::cout << "dx16 " << m_speed * (float) ((float) (dists[0] - dists[5]) / (float) m_samplerate) << std::endl;
+			std::cout << "dx17 " << m_speed * (float) ((float) (dists[0] - dists[6]) / (float) m_samplerate) << std::endl;
+			std::cout << "dx18 " << m_speed * (float) ((float) (dists[0] - dists[7]) / (float) m_samplerate) << std::endl;
 		}
 	}
 
