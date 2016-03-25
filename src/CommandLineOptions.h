@@ -26,7 +26,7 @@ private:
 	// documentation of the program
 	std::string doc = "soundSimulate -- simulate multiple sound sources and microphones\v"
 		"AUDIOPORT\tport to open the audio server on\n"
-		"GUIPORT\tport to open the gui server on\n";
+		"GUIPORT\t\tport to open the gui server on\n";
 
 	// documentation of non option arguments
     char args_doc[255] = "AUDIOPORT GUIPORT";

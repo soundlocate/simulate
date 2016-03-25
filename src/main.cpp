@@ -143,6 +143,7 @@ void terminate(int signal) {
 
 
 int main(int argc, char ** argv) {
+	CommandLineOptions options(argc, argv);
 	Window * window = new Window(800, 600, APPLICATION_NAME);
 	buffer points;
 	buffer lines;
@@ -166,8 +167,6 @@ int main(int argc, char ** argv) {
 	std::signal(SIGABRT, terminate);
 
 	double distBetween = 0.42;
-
-	CommandLineOptions options(argc, argv);
 
 	listener.push_back(SoundProcessor::v3(0, 0, 0));
 	listener.push_back(SoundProcessor::v3(0.0, distBetween, 0));
