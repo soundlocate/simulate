@@ -5,7 +5,9 @@
 #include <argp.h>
 
 #include <iostream>
+#include <cassert>
 
+#include "CSVTable.h"
 #include "config.h"
 
 class CommandLineOptions {
@@ -21,6 +23,26 @@ public:
     unsigned short guiPort() {
 		return args.guiPort;
 	}
+
+	unsigned int samplerate() {
+		return args.samplerate;
+	}
+
+	bool log() {
+		return args.log;
+	}
+
+	char * logfilename() {
+		return args.logfilename;
+	}
+
+	int micCount() {
+		return args.micCount;
+	}
+
+	double * mics() {
+		return args.mics;
+	}
 private:
 
 	// documentation of the program
@@ -32,15 +54,63 @@ private:
     char args_doc[255] = "AUDIOPORT GUIPORT";
 
 	// supported options (no custom options for now)
-    struct argp_option options[2] = {
+    struct argp_option options[5] = {
+		{"samplerate", 's', "COUNT", 0, "samplerate"},
+		{"soundfile", 'f', "FILE", 0, "soundfile to use"},
+		{"logfile", 'l', "FILE", 0, "if set write positions to set logfile"},
+		{"positionfile", 'p', "FILE", 0, "filename of micfile"},
 		{ 0 }
 	};
 
 	// struct for holding the argument info
 	struct arguments
 	{
+		unsigned int samplerate = 192000;
+		double * mics;
+		unsigned int micCount = 8;
+		bool log;
+		char * logfilename;
+		char * soundfile;
 		unsigned short audioPort;
 		unsigned short guiPort;
+
+		arguments() {
+			mics = new double[micCount * 3];
+			double distBetween = 0.42;
+			int i = 0;
+
+			mics[i++] = 0;
+			mics[i++] = 0;
+			mics[i++] = 0;
+
+			mics[i++] = 0;
+			mics[i++] = distBetween;
+			mics[i++] = 0;
+
+			mics[i++] = distBetween;
+			mics[i++] = 0;
+			mics[i++] = 0;
+
+			mics[i++] = distBetween;
+			mics[i++] = distBetween;
+			mics[i++] = 0;
+
+			mics[i++] = 0;
+			mics[i++] = 0;
+			mics[i++] = distBetween;
+
+			mics[i++] = distBetween;
+			mics[i++] = 0;
+			mics[i++] = distBetween;
+
+			mics[i++] = 0;
+			mics[i++] = distBetween;
+			mics[i++] = distBetween;
+
+			mics[i++] = distBetween;
+			mics[i++] = distBetween;
+			mics[i++] = distBetween;
+		}
 	};
 
 	// parsing of a single argument
@@ -51,6 +121,43 @@ private:
 
 		switch (key)
 		{
+		case 's':
+			try {
+				arguments->samplerate = std::stoi(arg);
+			} catch(std::invalid_argument) {
+				std::cout << "invalid samplerate " << arg << std::endl;
+				argp_usage(state);
+			}
+			break;
+		case 'f':
+			arguments->soundfile = arg;
+			break;
+		case 'l':
+			arguments->log = true;
+			arguments->logfilename = arg;
+			break;
+		case 'p': {
+			CSVTable t(arg);
+			auto rows = t.getRows();
+			arguments->micCount = rows.size();
+			arguments->mics = new double[rows.size() * 3];
+			int i = 0;
+
+			try {
+				for(auto row : rows) {
+					assert(row.size() == 3);
+
+					arguments->mics[i++] = std::stoi(row[0]);
+					arguments->mics[i++] = std::stoi(row[1]);
+					arguments->mics[i++] = std::stoi(row[2]);
+				}
+			} catch(std::invalid_argument) {
+				std::cout << "invalid positionfile " << arg << std::endl;
+				argp_usage(state);
+			}
+
+			break;
+		}
 		case ARGP_KEY_ARG: /* non option argument */
             // check if more than all needed arguments are passed (and abort if so)
 			if (state->arg_num >= 2) {

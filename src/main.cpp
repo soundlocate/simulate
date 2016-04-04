@@ -72,67 +72,17 @@ int glew_init() {
 	return 0;
 }
 
-int init_listeners(std::vector<float> &points_buffer, SoundProcessor &sound_processor, float radius) {
-	int count = 8;
-	double line_length = 0.42;
+int init_listeners(std::vector<SoundProcessor::v3> mics, std::vector<float> &points_buffer, SoundProcessor &sound_processor, float radius) {
+	for(auto mic : mics) {
+		points_buffer.push_back(mic.x);
+		points_buffer.push_back(mic.y);
+		points_buffer.push_back(radius);
+		points_buffer.push_back(1.0);
+		points_buffer.push_back(0.0);
+		points_buffer.push_back(0.0);
+	}
 
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(radius);
-	points_buffer.push_back(1.0);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(0.0);
-
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(line_length);
-	points_buffer.push_back(radius);
-	points_buffer.push_back(1.0);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(0.0);
-
-	points_buffer.push_back(line_length);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(radius);
-	points_buffer.push_back(1.0);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(0.0);
-
-	points_buffer.push_back(line_length);
-	points_buffer.push_back(line_length);
-	points_buffer.push_back(radius);
-	points_buffer.push_back(1.0);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(0.0);
-
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(radius);
-	points_buffer.push_back(1.0);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(0.0);
-
-	points_buffer.push_back(line_length);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(radius);
-	points_buffer.push_back(1.0);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(0.0);
-
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(line_length);
-	points_buffer.push_back(radius);
-	points_buffer.push_back(1.0);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(0.0);
-
-	points_buffer.push_back(line_length);
-	points_buffer.push_back(line_length);
-	points_buffer.push_back(radius);
-	points_buffer.push_back(1.0);
-	points_buffer.push_back(0.0);
-	points_buffer.push_back(0.0);
-
-	return count;
+	return mics.size();
 }
 
 void terminate(int signal) {
@@ -141,7 +91,7 @@ void terminate(int signal) {
 	exit(EXIT_SUCCESS);
 }
 
-
+//ToDo(robin): add support for log
 int main(int argc, char ** argv) {
 	CommandLineOptions options(argc, argv);
 	Window * window = new Window(800, 600, APPLICATION_NAME);
@@ -157,8 +107,8 @@ int main(int argc, char ** argv) {
 	int mouseX = 0, mouseY = 0, mouseDX = 0, mouseDY = 0, screenSizeX = window->getSize().x, screenSizeY =  window->getSize().y;
 
 	float scale[2] = {1.0, 1.0}, centerX = 0.0, centerY = 0.0, mouseDXScreen = 0.0, mouseDYScreen = 0.0;
-	float radius = 50;
-	unsigned int samplerate = 192000;
+	float radius = 20;
+	unsigned int samplerate = options.samplerate();
 
 	std::vector<SoundProcessor::v3> listener;
 
@@ -168,14 +118,11 @@ int main(int argc, char ** argv) {
 
 	double distBetween = 0.42;
 
-	listener.push_back(SoundProcessor::v3(0, 0, 0));
-	listener.push_back(SoundProcessor::v3(0.0, distBetween, 0));
-	listener.push_back(SoundProcessor::v3(distBetween, 0.0, 0.0));
-	listener.push_back(SoundProcessor::v3(distBetween, distBetween, 0));
-	listener.push_back(SoundProcessor::v3(0.0, 0.0, distBetween));
-	listener.push_back(SoundProcessor::v3(distBetween, 0.0, distBetween));
-	listener.push_back(SoundProcessor::v3(0.0, distBetween, distBetween));
-	listener.push_back(SoundProcessor::v3(distBetween, distBetween, distBetween));
+	double * mics = options.mics();
+
+	for(int i = 0; i < options.micCount(); i++) {
+		listener.push_back(SoundProcessor::v3(mics[3 * i], mics[3 * i + 1], mics[3 * i + 2]));
+	}
 
 	std::cout << "mics: [" << std::endl;
 	for(auto l : listener) {
@@ -190,7 +137,7 @@ int main(int argc, char ** argv) {
 
 	glew_init();
 
-	int listener_count = init_listeners(points_buffer, soundProcessor, radius);
+	int listener_count = init_listeners(listener, points_buffer, soundProcessor, radius);
 
 	server = new Server(options.audioPort(), [listener](sf::TcpSocket * socket) {
 			unsigned int size = listener.size();
@@ -423,7 +370,6 @@ int main(int argc, char ** argv) {
 
 		free(current_samples);
 
-
 		TICK("simulation_draw");
 
 	    glBindVertexArray(points.vao);
@@ -446,7 +392,7 @@ int main(int argc, char ** argv) {
 
 		glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STREAM_DRAW);
 
-		// Todo(robin): better solution!!
+		// ToDo(robin): better solution!!
 		//if(count > listener.size())
 			glDrawArrays(GL_POINTS, 0, data.size() / 6);
 
