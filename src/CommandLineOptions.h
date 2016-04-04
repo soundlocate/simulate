@@ -137,7 +137,9 @@ private:
 			arguments->logfilename = arg;
 			break;
 		case 'p': {
-			CSVTable t(arg);
+      std::cout << "reading micsfile " << arg << std::endl; 
+
+      CSVTable t(arg);
 			auto rows = t.getRows();
 			arguments->micCount = rows.size();
 			arguments->mics = new double[rows.size() * 3];
@@ -147,14 +149,16 @@ private:
 				for(auto row : rows) {
 					assert(row.size() == 3);
 
-					arguments->mics[i++] = std::stoi(row[0]);
-					arguments->mics[i++] = std::stoi(row[1]);
-					arguments->mics[i++] = std::stoi(row[2]);
+					arguments->mics[i++] = std::stod(row[0]);
+					arguments->mics[i++] = std::stod(row[1]);
+					arguments->mics[i++] = std::stod(row[2]);
 				}
 			} catch(std::invalid_argument) {
 				std::cout << "invalid positionfile " << arg << std::endl;
 				argp_usage(state);
 			}
+
+      std::cout << "read micsfile " << arg << std::endl; 
 
 			break;
 		}

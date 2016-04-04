@@ -93,7 +93,7 @@ void terminate(int signal) {
 
 //ToDo(robin): add support for log
 int main(int argc, char ** argv) {
-	CommandLineOptions options(argc, argv);
+  CommandLineOptions options(argc, argv);
 	Window * window = new Window(800, 600, APPLICATION_NAME);
 	buffer points;
 	buffer lines;
@@ -107,7 +107,7 @@ int main(int argc, char ** argv) {
 	int mouseX = 0, mouseY = 0, mouseDX = 0, mouseDY = 0, screenSizeX = window->getSize().x, screenSizeY =  window->getSize().y;
 
 	float scale[2] = {1.0, 1.0}, centerX = 0.0, centerY = 0.0, mouseDXScreen = 0.0, mouseDYScreen = 0.0;
-	float radius = 20;
+	float radius = 50;
 	unsigned int samplerate = options.samplerate();
 
 	std::vector<SoundProcessor::v3> listener;

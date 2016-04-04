@@ -37,8 +37,8 @@ std::vector<float> GuiServer::getPoints() {
 		return m_points;
 	} else {
 		if(received != sizeof(unsigned int)) {
-			std::cerr << "did not receive whole int, don't know what to do :(" << std::endl;
-			std::cerr << sizeof(unsigned int) << " != " << received << std::endl;
+			// std::cerr << "did not receive whole int, don't know what to do :(" << std::endl;
+			// std::cerr << sizeof(unsigned int) << " != " << received << std::endl;
 			return m_points;
 		}
 
@@ -48,7 +48,7 @@ std::vector<float> GuiServer::getPoints() {
 	    client->receive(receive_buffer, to_receive, received);
 
 		if(received != to_receive) {
-			std::cerr << "did not receive all data in one go :(\nBuild support for that!" << std::endl;
+			// std::cerr << "did not receive all data in one go :(\nBuild support for that!" << std::endl;
 
 			return m_points;
 		}
