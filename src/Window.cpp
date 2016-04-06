@@ -9,7 +9,7 @@ Window::Window(int x, int y, const char * name) {
     settings.minorVersion = 0;
 
 	m_window = new sf::RenderWindow(sf::VideoMode(x, y), name, sf::Style::Default, settings);
-
+	m_window->setVerticalSyncEnabled(true);
     settings = m_window->getSettings();
 
     std::cout << "DEPTH BITS: " << settings.depthBits << std::endl;
